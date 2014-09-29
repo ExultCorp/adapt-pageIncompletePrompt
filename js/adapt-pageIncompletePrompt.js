@@ -42,7 +42,9 @@ define(function(require) {
 	});
 	
 	Adapt.on("router:page", function(pageView) {
-		if(isEnabled()) enableRouterNav(false);
+		if(isEnabled()) {
+			enableRouterNav(false);
+		}
 	});
 	
 	Adapt.on("navigation:backButton", function() {
@@ -61,7 +63,9 @@ define(function(require) {
 			}
 			Adapt.trigger("notify:prompt", promptObject);
 		}
-		else enableRouterNav(true);
+		else {
+			enableRouterNav(true);
+		}
 	});
 	
 	Adapt.on("pageIncompletePrompt:leavePage", function() {
