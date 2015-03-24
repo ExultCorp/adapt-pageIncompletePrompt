@@ -32,6 +32,25 @@ define(function(require) {
 	var enableRouterNav = function(value) {
 		Adapt.router.set("_canNavigate", value,{ pluginName: PLUGIN_NAME });
 	};	
+
+	var handleNav = function(event) {
+		if(!allComponentsComplete()) {	
+			var promptObject = {
+				title: model.title,
+				body: model.message,
+				_prompts:[{
+					promptText: model._buttons.yes,
+					_callbackEvent: "pageIncompletePrompt:" + event,
+				},{
+					promptText: model._buttons.no,
+					_callbackEvent: ""
+				}],
+				_showIcon: true
+			}
+			Adapt.trigger("notify:prompt", promptObject);
+		}
+		else enableRouterNav(true);
+	}
 	
 	/**
 	* Adapt events
@@ -42,34 +61,24 @@ define(function(require) {
 	});
 	
 	Adapt.on("router:page", function(pageView) {
-		if(isEnabled()) {
-			enableRouterNav(false);
-		}
+		if(isEnabled()) enableRouterNav(false);
 	});
 	
 	Adapt.on("navigation:backButton", function() {
-		if(!allComponentsComplete()) {	
-			var promptObject = {
-				title: model.title,
-				body: model.message,
-				_prompts:[{
-					promptText: model._buttons.yes,
-					_callbackEvent: "pageIncompletePrompt:leavePage",
-				},{
-					promptText: model._buttons.no,
-					_callbackEvent: ""
-				}],
-				_showIcon: true
-			}
-			Adapt.trigger("notify:prompt", promptObject);
-		}
-		else {
-			enableRouterNav(true);
-		}
+		handleNav("backButton");
+	});
+
+	Adapt.on("navigation:menuButton", function() {
+		handleNav("menuButton");
 	});
 	
-	Adapt.on("pageIncompletePrompt:leavePage", function() {
+	Adapt.on("pageIncompletePrompt:backButton", function() {
 		enableRouterNav(true);
 		Adapt.trigger("navigation:backButton");
+	});
+
+	Adapt.on("pageIncompletePrompt:menuButton", function() {
+		enableRouterNav(true);
+		Adapt.trigger("navigation:menuButton");
 	});
 });
